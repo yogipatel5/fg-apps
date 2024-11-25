@@ -1,0 +1,81 @@
+General Rules:
+Required Fields for All Entries:
+
+type (either product or variant)
+id (unique identifier)
+sku (stock keeping unit)
+name (display name)
+enabled (1 if the item is active, 0 otherwise)
+slug (URL-friendly name, optional for variants)
+Parent-Child Relationships:
+
+Products (type = product) do not require a parent_sku.
+Variants (type = variant) must include a parent_sku linking to their parent product.
+Rules for product Entries:
+Core Fields:
+
+Must include id, sku, name, and enabled.
+Optional fields: slug and description.
+Purpose:
+
+Represents a standalone product or a grouping of variants.
+Exclusions:
+
+Does not include fields like items, variant_type, or download_link.
+Rules for variant Entries:
+Core Fields:
+
+Must include id, sku, parent_sku, and name.
+Optional fields: slug, description, variant_type.
+Additional Fields Based on variant_type:
+
+Gift Message
+Includes a description field (custom text for the gift message).
+Does not require items or download_link.
+Bundle
+Requires an items field, listing included SKUs and their quantities.
+Each bundled item must have:
+item_sku (non-null)
+item_qty (non-zero quantity)
+Ebook
+Must include download_link (URL to download the ebook).
+Does not require items.
+Simple (No Options)
+Contains only the basic fields (id, sku, name, enabled, and parent_sku).
+No additional fields like items or description.
+Data-Specific Rules:
+Item Fields (itemX_sku, itemX_qty, etc.):
+
+Up to 40 bundled items are supported (e.g., item1_sku to item40_sku).
+Only populate these fields if variant_type = Bundle.
+Ensure both sku and qty are non-null and valid for each bundled item.
+Enabled Status:
+
+enabled = 1 for active entries.
+enabled = 0 for inactive entries.
+Slug Uniqueness:
+
+Ensure slug is unique across all products to avoid URL conflicts.
+Variants can share the parent product's slug if not explicitly defined.
+Optional Fields:
+
+Fields like description, download_link, and items are conditional based on the variant_type.
+Validation Rules:
+Parent SKU Validation:
+
+Every variant must reference an existing product via parent_sku.
+Consistency of Variant Type:
+
+Ensure variant_type aligns with the expected fields:
+Bundle → Requires items.
+Gift Message → Requires description.
+Ebook → Requires download_link.
+Item Quantity Validation:
+
+For Bundle variants, each itemX_qty must be a positive integer.
+SKUs in itemX_sku must be valid and non-null.
+Usage Scenarios:
+Gift Messages: Limited to text-based customization, no additional items or links.
+Bundles: Used for packaging multiple products; requires detailed items.
+Ebooks: Digital products requiring a download link.
+Simple Products: No options or additional requirements; only basic details needed.

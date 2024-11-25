@@ -1,0 +1,104 @@
+Status,Replacement Status,Item Name,SKU,REPLACE_WITH,Old,Simple Name,Child Name
+OLD,Need,Meal Prep Combo Pack (2 Set),2PK-MPC-2,,Need,OLD - The Meal Prep Combo - 2 Pack,OLD - Everything Seasoning
+OLD,Need,Meal Prep Combo Pack (4 Set),4PK-MPC-2,,Need,OLD - The Meal Prep Combo - 4 Pack,OLD - Everything Seasoning
+OLD,Need,Meal Prep Combo Pack (6 Set),6PK-MPC-2,,Need,OLD - Meal Prep Combo,OLD - Everything Seasoning
+OLD,Need,The Breakfast Club Duo Combo Pack (2 Set),BRKFSTCLB-DUO,,Need,OLD - The Breakfast Club - Duo,OLD - Chicken and Waffles
+OLD,Substitute Sku,Pizza Seasoning (Double Pack),DBLPK-PZA,,DBLPK-PZA,OLD - Double Pack - Pizza,OLD - Pizza Seasoning
+OLD,Substitute Sku,Lemon & Garlic Seasoning (Double Pack),DBLPK-LMNGRLC,,DBLPK-LMNGRLC,OLD - Double Pack - Lemon & Garlic,OLD - Lemon & Garlic Seasoning
+OLD,CP-BRKFSTCLB,The Breakfast Club Trio Combo Pack (3 Set),BRKFSTCLB-TRIO,,Need,OLD - The Breakfast Club - Trio,OLD - Chicken and Waffles
+OLD,CP-CHFSPC,Chef Spice Combo Pack (14 Set),CHFSPCRK-7,,Need,OLD - Chef Spice Rack,OLD - Everything Seasoning
+OLD,CP-CLSC4,"Classic Combo Pack Seasoning, Pack of 4 (Everything, Everything Spicy, Garlic Lovers, Lemon & Garlic) - Spice & Seasoning Gift Set - Low Sodium Chicken,Beef, Seafood Seasoning & Chicken by Flavor God",COMBOPACK,,Need,OLD - Classic Combo Set,OLD - Everything Seasoning
+OLD,Need,"Classic Combo Pack Seasoning Set of 2 (Everything, Garlic Lovers ) - Premium All Natural & Healthy Spice Blend - Low Sodium Chicken, Beef, Seafood, Chicekn Seasonings by Flavor God",CP-CLSC-2EVGL,,Need,OLD - Classic Combo 2 pack,OLD - Everything Seasoning
+OLD,Need,"Classic Combo Pack Seasoning Set of 3 (Everything, Garlic Lovers, Everything Spicy ) - Premium All Natural & Healthy Spice Blend - Low Sodium Chicken, Beef, Seafood, Chicekn Seasonings by Flavor God",CP-CLSC-3EVSPGL,,Need,OLD - Classic Combo 3 pack,OLD - Everything Seasoning
+OLD,Need,Holiday Combo Pack (2 Set),CP-HLDY-2PPGC,,Need,"OLD - Holiday Pack (Amazon) - 2 Bottle (Pumpkin Pie, Gingerbread)",OLD - Pumpkin Pie Seasoning
+OLD,Need,Holiday Combo Pack (3 Set),CP-HLDY-3PPGCFST,,Need,"OLD - Holiday Pack (Amazon) - 3 Bottle (Pumpkin Pie, Gingerbread, Fiesta)",OLD - Pumpkin Pie Seasoning
+OLD,Need,Holiday Combo Pack (4 Set),CP-HLDY-4PPGCFSTCH,,Need,"OLD - Holiday Pack (Amazon) - 4 Bottle (Pumpkin Pie, Gingerbread, Fiesta, Chocolate Donut)",OLD - Pumpkin Pie Seasoning
+OLD,Need,"Keto Seasoning & Spices Pack (2 Set - Everything, Taco Tuesday ) for Keto Diet on Keto Meals, Keto Spices, No Carb Seasonings, Keto Taco Seasoning, BBQ Keto, Keto Seasoning for Chicken by Flavor God",CP-KTO-2EVTT,,Need,OLD - Keto Combo 2 pack,OLD - Everything Seasoning
+OLD,Need,"Keto Seasoning & Spices Pack (4 Set - Garlic Lovers, Himalayan Salt & Pink Peppercorn) for Keto Diet on Keto Meals, Keto Spices, No Carb Seasonings, Keto Taco Seasoning, BBQ Keto, Paleo by Flavor God",CP-KTO-4EVGLTTHS,,Need,OLD - Keto Combo 4 pack,OLD - Everything Seasoning
+OLD,Need,Popcorn Combo Pack (2 Set),CP-PCN-2RNPZ,,Need,OLD - Popcorn Combo 2 pack,OLD - Ranch Seasoning
+OLD,Need,Popcorn Combo Pack (3 Set),CP-PCN-3RNPZFST,,Need,OLD - Popcorn Combo 3 pack,OLD - Ranch Seasoning
+OLD,Need,Savory & Spicy Combo Pack (4 Set),CP-SVRSPC,,Need,OLD - Savory & Spicy Combo,OLD - Garlic Lover's Seasoning
+OLD,Need,Sweet & Spicy Combo Pack (3 Set),CP-SWTSPC,,Need,OLD - Sweet & Spicy Combo,OLD - Ghost Seasoning
+OLD,Need,Chocolate Donut Topper (Double Pack),DBLPK-CHCDNT,,Need,OLD - Double Pack - Chocolate Donut,OLD - Chocolate Donut Seasoning
+OLD,Need,Chicken & Waffles Topper (Double Pack),DBLPK-TPR-CHKWFL,,Need,OLD - Double Pack - Chicken & Waffles Topper,OLD - Chicken and Waffles
+OLD,Need,Football Combo Pack (3 Set),FB-PCK-JAN,,Need,OLD - Football Seasoning Pack,OLD - Pizza Seasoning
+Current,,"Everything Bagel Seasoning Mix by Flavor God, Pack of 2 - Premium All Natural & Healthy Spice Blend for Bagels, Chicken, & Eggs - Kosher, Gluten-Free & No MSG",BND-EVBG-2,,,"Everything Bagel Seasoning, Pack of 2",Everything Bagel Seasoning
+OLD,Need,"Keto Seasoning & Spices Pack (3 Set - Everything, Garlic Lovers, Taco) for Keto Diet on Keto Meals, Keto Spices, No Carb Seasonings, Keto Taco Seasoning, BBQ Keto, Chicken Spices by Flavor God",FG-KETO-3B,,Need,OLD - Keto 3 Bottle Combo Pack,OLD - Everything Seasoning
+OLD,Need,"Keto Seasoning & Spices Pack (6 Set - Everything, Garlic Lovers, Taco, Pizza, Nacho Cheese, Himalayan Salt & Pink Peppercorn) for Keto Diet on , Keto Spices, No Carb, Keto Condiments by Flavor God",FG-KETO-6B-2,,Need,OLD - Keto 6 Bottle Combo Pack,OLD - Nacho Cheese
+OLD,Need,Munchies Combo Pack (4 Set),FG-MNCHCP,,Need,OLD - Munchies Combo Pack,OLD - Pizza Seasoning
+Current,,"Cold Stone Creamery Ice Cream Seasoning Toppers by FlavorGod (2-Pack) - Healthy Dessert Toppers - 0 Calories, 0 Sodium, Kosher - Try with Coffee, Yogurt, & Ice Cream - Cheesecake & Vanilla Combo",CLST-CHVN-2,,,Cold Stone Combo - Cheesecake & Vanilla Waffle Cone,Cold Stone Cheesecake
+Current,,"Ranch Seasoning by Flavor God, Sugar Free Ranch Substitute Low Sodium Seasoning, Gluten-Free Dry Ranch Mix, Keto & Paleo Friendly Ranch Seasoning Salad Dressing for Pizza, Popcorn, & Salads - 4.2 OZ",TP-RNCH,TP-RNCH,,,#N/A
+Current,,"The Original Pumpkin Pie Spice Topper Seasoning Mix by Flavor God - Premium All Natural & Healthy Spice Blend for Donuts & Smoothies - Kosher, Low Sodium, Dairy-Free, Vegan & Keto Friendly",TP-PMPI,TP-PMPI,,,#N/A
+Current,,"Gingerbread Cookie Seasoning Mix by Flavor God - Premium All Natural & Healthy Spice Blend for Ice Cream, Coffee, Donuts & Cookies - Kosher, Low Sodium, Dairy-Free & Gluten-Free - Great Flavor Spices",TP-GBCK,TP-GBCK,,,#N/A
+Current,,"Fiesta Sweet & Tangy Seasoning Mix by Flavor God - Premium All Natural & Healthy Spice Blend for Salad, Pasta, Chicken & Seafood - Kosher, Low Sodium, Dairy-Free, Vegan & Keto Friendly",TP-FSTA,TP-FSTA,,,#N/A
+Current,,"Chicken & Waffles Seasoning Topper Mix by Flavor God - Premium All Natural & Healthy Spice Blend for Chicken, Pasta & Vegetables - Kosher, Low Sodium, & Gluten-Free - Great Flavor Spices and Seasonin",TP-CHWF,TP-CHWF,,,#N/A
+Current,,FlavorGod Chocolate Donut Topper,TP-CHDN,TP-CHDN,,,#N/A
+Current,,FlavorGod Buttery Cinnamon Roll Topper,TP-BCRL,TP-BCRL,,,#N/A
+Current,,"Taco Tuesday Seasoning Mix by Flavor God - Premium All Natural & Healthy Spice Blend for Grilling Chicken, Beef, Seafood, Vegetables, Salad - Kosher, Gluten-Free, Dairy-Free, Vegan, Keto Friendly",SN-TACO,SN-TACO,,,#N/A
+Current,,"Sriracha Seasoning by Flavor God - Premium All Natural & Healthy Spice Blend for Chicken, Hot Dogs, Onion Rings, Popcorn, & Sliders - Kosher, Low Sodium, Gluten-Free, Dairy-Free, Paleo, Vegan-Friendl",SN-SRCH,SN-SRCH,,,#N/A
+Current,,"Pizza Seasoning Mix by Flavor God - Premium All Natural & Healthy Spice Blend for Grilling Chicken, Beef, Seafood, Vegetables, Salad, Tacos, Ravioli, & Pasta- Kosher, Gluten-Free, Dairy-Free, Vegan",SN-PZA,SN-PZA,,,#N/A
+Current,,"Nacho Cheese Seasoning Mix by Flavor God - Premium All Natural & Healthy Spice Blend for Chicken, Nachos, Dips, Chicken Nuggets, Salad, Pizza, Tacos, & Pasta - Kosher, Dairy-Free, Glute",SN-NCHO,SN-NCHO,,,#N/A
+Current,,"Lemon Garlic Seasoning Mix by Flavor God - Premium All Natural & Healthy Spice Blend for Chicken, Seafood, Salads & Vegetables - Kosher, Low Sodium, Dairy-Free, Vegan & Keto Friendly",SN-LMGR,SN-LMGR,,,#N/A
+Current,,"Ketchup Seasoning Mix by Flavor God - Premium All Natural & Healthy Spice Blend for Grilling Chicken, Beef, Seafood, Vegetables, Salad, Tacos, Pizza, & Pasta - Kosher, Gluten-Free, Dairy-Free, Vegan,",SN-KCHP,SN-KCHP,,,#N/A
+Current,,"Italian Zest Seasoning Mix by Flavor God - Premium All Natural & Healthy Spice Blend for Salad, Pasta, Chicken & Seafood - Kosher, Low Sodium, Dairy-Free, Vegan & Keto Friendly - 2.3 oz",SN-ITZS,SN-ITZS,,,#N/A
+Current,,"Hot Wings Seasoning Mix by Flavor God - Premium All Natural & Healthy Spice Blend for Chicken Wings, Eggs, Seafood & Vegetables - Kosher, Low Sodium, Vegan, Gluten-Free & Keto Friendly",SN-HTWN,SN-HTWN,,,#N/A
+Current,,"Habanero Seasoning Mix by Flavor God - Premium All Natural & Healthy Spice Blend for Burritos, Tacos, Seafood & Chicken - Kosher, Low Sodium, Dairy-Free, Vegan & Keto Friendly",SN-HBNR,SN-HBNR,,,#N/A
+Current,,"Garlic Lovers Seasoning Mix by Flavor God - Premium All Natural & Healthy Spice Blend for Grilling Chicken, Beef, Seafood, Vegetables, Salad, Tacos, Pizza, & Pasta - Kosher, Gluten-Free, Dairy-Free",SN-GRLV,SN-GRLV,,,#N/A
+Current,,"Ghost Pepper Seasoning Mix by Flavor God - Premium All Natural & Healthy Spice Blend for Grilling Chicken, Beef, Seafood, Vegetables, Eggs, Salad, Tacos, & Pizza - Kosher, Gluten-Free, Dairy-Free, V",SN-GHST,SN-GHST,,,#N/A
+Current,,"Everything Spicy Seasoning Mix by Flavor God - Premium All Natural & Healthy Spice Blend for Steak, Salad, Chicken, Dips & Vegetables - Kosher, Low Sodium, Dairy-Free, Vegan & Keto Friendly -(3.6 oz)",SN-EVSP,SN-EVSP,,,#N/A
+Current,,FlavorGod Everything Seasoning,SN-EVRY,SN-EVRY,,,#N/A
+Current,,"Everything Bagel Seasoning Mix by Flavor God - Premium All Natural & Healthy Spice Blend for Bagels, Chicken, Eggs, Vegetables & Salad- Kosher, Gluten-Free & No MSG Great Flavor Spices and Seasoning",SN-EVBG,SN-EVBG,,,#N/A
+Current,,"No Salt Seasoning, Everything but the Salt Seasoning by Flavor God, No Sodium, Natural, Garlic, Chili & Black Pepper, Salt Substitute, Salt Free, Spices with Flavor, Low Sodium Vegan, Popcorn, Pasta",SN-EBTS,SN-EBTS,,,#N/A
+Current,,"Cajun Lovers Seasoning Mix by Flavor God - Premium All Natural & Healthy Spice Blend for Grilling Chicken, Beef, Seafood, Vegetables, Salad, Tacos, Pizza, & Pasta - Kosher, Gluten-Free, Dairy-Free",SN-CJLV,SN-CJLV,,,#N/A
+Current,,"Cheese Flavored Seasoning Mix by FlavorGod - Premium All Natural & Healthy Spice Blend for Chicken, Vegetables, Salad, Pizza, Tacos, & Pasta - Kosher, Dairy-Free, Gluten-Free, Keto Friendly (2.6 oz)",SN-CHSE,SN-CHSE,,,#N/A
+Current,,"Chipotle Seasoning Mix by Flavor God - Premium All Natural & Healthy Spice Blend for Grilling Chicken, Beef, Seafood, Vegetables, Salad, Tacos, Pizza, & Pasta - Kosher, Gluten-Free, Dairy-Free, Vegan",SN-CHPL,SN-CHPL,,,#N/A
+Current,,"Buffalo Seasoning Mix by Flavor God - Premium All Natural & Healthy Spice Blend for Grilling Chicken, Beef, Seafood, Vegetables, Hot Wings, French Fries & Cauliflower - Kosher, Gluten-Free, Dairy-Fre",SN-BFLO,SN-BFLO,,,#N/A
+Current,,"Bacon Lovers Seasoning Mix by Flavor God - Premium All Natural & Healthy Spice Blend for Beef, Eggs, Salad & Vegetables - Kosher, Low Sodium, Gluten-Free, Vegan & Keto Friendly",SN-BCLV,SN-BCLV,,,#N/A
+Current,,"Steak & Chop Rub Seasoning Mix by Flavor God - Premium All Natural & Healthy Spice Blend for Beef, Pork & Vegetables - Kosher, Zero Carbs, Gluten-Free, Vegan & Keto Friendly - Great Flavor Spices",RB-STKC,RB-STKC,,,#N/A
+Current,,"Original BBQ Rub Mix by Flavor God - Premium All Natural & Healthy Spice Blend for Grilling Chicken, Wings, Beef, Pork, Bacon, Eggs, Seafood, Vegetables, Salad, Tacos, Pizza - Kosher, Gluten-Free",RB-OBBQ,RB-OBBQ,,,#N/A
+Current,,"Jamaican Jerk Rub Mix by Flavor God - Premium All Natural & Healthy Spice Blend for Grilling Chicken, Beef, Seafood, Vegetables, Salad, Tacos, Pizza, Pasta - Kosher, Gluten-Free, Dairy-Free, Vegan",RB-JMJR,RB-JMJR,,,#N/A
+Current,,"Honey BBQ Rub Mix by Flavor God - Premium All Natural & Healthy Spice Blend for Grilling Chicken, Beef, Seafood, Vegetables, Salad, Tacos, Pizza, Beans, Ravioli, & Pasta - Kosher, Gluten-Free",RB-HNBQ,RB-HNBQ,,,#N/A
+Current,,"Himalayan Salt & Pink Peppercorn Finisher by Flavor God - Premium All Natural & Healthy Spice Blend for Eggs, Pork, Beef, Vegetables, Dips Kosher, Gluten-Free, Dairy-Free, Paleo, Vegan, Keto-Friendly",FS-HSPP,FS-HSPP,,,#N/A
+Current,,"Garlic & Herb Salt Finisher by Flavor God - Premium All Natural & Healthy Spice & Seasoning Mix Blend for Chicken, Beef, Seafood & Vegetables - Kosher, Low Sodium, Dairy-Free, Vegan & Keto Friendly",FS-GRHS,FS-GRHS,,,#N/A
+Current,,"Dessert Topper 4 Bottle Combo by Flavor God Seasonings, Natural Healthy Blend for Coffee, Oatmeal",DCP-4TPRS,,,"Dessert Topper 4 Bottle Combo (CD, GC, BCR, PP)",Chocolate Donut Topper
+Current,,Foodie Combo Pack (7 Set),CP-FOODIE-7,,,"Foodie Combo Pack (Garlic Lovers, Italian Zest, Taco Tuesday, Pizza, Everything Spicy, Cheese Flavor & Mystery Flavor), Pack of 7",Garlic Lover's Seasoning
+Current,,"Cold Stone Creamery Ice Cream Seasoning Toppers by FlavorGod (4-Pack) - Healthy Dessert Toppers - 0 Calories, 0 Sodium, Kosher - Try with Coffee, Yogurt, Ice Cream, & Fruit - Dessert Lover Combo",CP-DSRTCS-4,,,"Dessert Lovers (BCR, CD, CSVW, CSC)",Chocolate Donut Topper
+Current,,"Flavor God Dynamic Dessert Duo Pack of 2 Seasoning Topper Gift Set, Buttery Cinnamon Roll & Chocolate Donut, Natural Healthy Blend For Donuts, Fruit Ice Cream, Coffee, Low Sodium, Gluten & Dairy Free",CP-DSRT-2,,,"Dessert Duo Pack of 2 Toppers, Buttery Cinnamon Roll & Chocolate Donut",Buttery Cinnamon Roll Topper
+Current,,"Cold Stone Ice Cream Seasoning Toppers by FlavorGod - Healthy Dessert Toppers - 0 Calories, 0 Sodium, Kosher, Made in USA (Vanilla Waffle Cone)",CLST-VNWC,CLST-VNWC,,,#N/A
+Current,,"Cold Stone Ice Cream Seasoning Toppers by FlavorGod - Healthy Dessert Toppers - 0 Calories, 0 Sodium, Kosher, Made in USA (Cheesecake)",CLST-CHSK,CLST-CHSK,,,#N/A
+Current,,"Ranch Seasoning Mix by Flavor God, Pack of 2- Premium All Natural & Healthy Spice Blend for Chicken, Pizza, Salads & Vegetables - Kosher, Low Sodium, Vegan & Keto Friendly",BND-RNCH-2,,,"Ranch Seasoning, Pack of 2",Ranch Topper
+Current,,"The Original Pumpkin Pie Spice Topper Seasoning Mix, 2 Bottles by Flavor God - Premium All Natural & Healthy Spice Blend for Donuts & Smoothies - Great Flavor Spices and Seasoning Gift",BND-PMPI-2,,,"Pumpkin Pie Spice Topper, 2 Bottles",Pumpkin Pie Topper
+Current,,"Nacho Cheese Seasoning Mix by Flavor God, Pack of 2 - Premium All Natural & Healthy Spice Blend for Nachos, Dips, Chicken Nuggets & Vegetables - Kosher, Low Sodium, Gluten-Free & Keto Friendly",BND-NCHO-2,,,"Nacho Cheese Seasoning, Pack of 2",Nacho Cheese Seasoning
+Current,,"Himalayan Salt & Pink Peppercorn Finisher by Flavor God, Pack of 2 - Premium All Natural & Healthy Spice & Seasoning Blend for Beef & Chicken - Zero Carbs, Great Flavor Spices and Seasoning Gift",BND-HSPP-2,,,"Himalayan Salt & Pink Peppercorn Finisher, Pack of 2",Himalayan Salt & Pink Peppercorn Finisher
+Current,,"Honey BBQ Rub Mix, 2 Bottles by Flavor God - Premium All Natural & Healthy Spice Blend for Grilling Chicken, Beef, Chili, Seafood, Vegetables, & Salad - Kosher, Gluten-Free, Dairy-Free Steak Rub",BND-HNBQ-2,,,"Honey BBQ Rub Mix, 2 Bottles",Honey BBQ Rub
+Current,,"Habanero Seasoning Mix by Flavor God, 2-Pack - Premium All Natural & Healthy Spice Blend for Burritos, Tacos, Seafood & Chicken - Kosher, Low Sodium, Dairy-Free, Vegan & Keto Friendly",BND-HBNR-2,,,"Habanero Seasoning, 2-Pack",Habanero Seasoning
+Current,,"Fiesta Sweet & Tangy Seasoning Mix by Flavor God, Pack of 2 - Premium All Natural & Healthy Spice Blend for Salad, Pasta, Chicken & Seafood - Kosher, Low Sodium, Dairy- Free, Vegan & Keto Friendly",BND-FSTA-2,,,"Fiesta Sweet & Tangy Seasoning,, Pack of 2",Fiesta Sweet & Tangy Topper
+OLD,Need,Popcorn Combo Pack (4 Set),POPCORN-PCK-2,,Need,OLD - Popcorn Seasoning Pack,OLD - Spicy Everything Seasoning
+OLD,Need,Rubs Combo Pack (4 Set),RUBSCMBO-4,,Need,OLD - Rubs Combo (4 pack),OLD - BBQ Rub
+OLD,Need,Super Garlic Bros Combo Pack (2 Set),SPRGRLCBROS,,Need,OLD - Super Garlic Bros.,OLD - Garlic Lover's Seasoning
+OLD,Substitute Sku,"Taco Tuesday Seasoning (Double Pack), Taco Spices, Low Salt Taco Seasoning, Low Sodium Taco Seasonings, Gluten Free Taco Mix, Sugar Free Taco Seasoning by Flavor God (Flavorgod)",DBLPK-TCOTUES,DBLPK-TCOTUES,DBLPK-TCOTUES,OLD - Double Pack - Taco Tuesday,OLD - Taco Tuesday Seasoning
+OLD,Substitute Sku,Steak & Chop Rub (Double Pack),DBLPK-STKCHP,DBLPK-STKCHP,DBLPK-STKCHP,OLD - Double Pack - Steak & Chop Rub,OLD - Steak & Chop Rub
+OLD,Substitute Sku,Sriracha Seasoning (Double Pack),DBLPK-SRCHA,DBLPK-SRCHA,DBLPK-SRCHA,OLD - Double Pack - Sriracha,OLD - Sriracha Seasoning
+OLD,Substitute Sku,Original BBQ Rub (Double Pack),DBLPK-RUB-BBQ,DBLPK-RUB-BBQ,DBLPK-RUB-BBQ,OLD - Double Pack - Original BBQ Rub,OLD - BBQ Rub
+OLD,Substitute Sku,Ketchup Seasoning (Double Pack),DBLPK-KTCHP,DBLPK-KTCHP,DBLPK-KTCHP,OLD - Double Pack - Ketchup,OLD - Ketchup Seasoning
+OLD,Substitute Sku,Jamaican Jerk Rub (Double Pack),DBLPK-JMJRK,DBLPK-JMJRK,DBLPK-JMJRK,OLD - Double Pack - Jamaican Jerk,OLD - Jamaican Jerk Seasoning
+OLD,Substitute Sku,Italian Zest Seasoning (Double Pack),DBLPK-ITLZST,DBLPK-ITLZST,DBLPK-ITLZST,OLD - Double Pack - Italian Zest,OLD - Italian Zest Seasoning
+OLD,Substitute Sku,Hot Wings Seasoning (Double Pack),DBLPK-HTWNGS,DBLPK-HTWNGS,DBLPK-HTWNGS,OLD - Double Pack - Hot Wings,OLD - Hot Wings Seasoning
+OLD,Substitute Sku,Garlic Lovers Seasoning (Double Pack),DBLPK-GRLCLVRS,DBLPK-GRLCLVRS,DBLPK-GRLCLVRS,OLD - Double Pack - Garlic Lovers,OLD - Garlic Lover's Seasoning
+OLD,Substitute Sku,"Garlic Himalayan Salt Seasoning (Double Pack) by Flavor God, Himalayan Salt, Healthy, Garlic Black Pepper, Herb Spices, Sage, Thyme, Kosher, Non-GMO",DBLPK-GRLCHIMSLT,DBLPK-GRLCHIMSLT,DBLPK-GRLCHIMSLT,OLD - Double Pack - Garlic Herb & Himalayan Salt,OLD - Garlic Herb & Himalayan Salt Seasoning
+OLD,Substitute Sku,Ghost Seasoning (Double Pack),DBLPK-GHST,DBLPK-GHST,DBLPK-GHST,OLD - Double Pack - Ghost,OLD - Ghost Seasoning
+OLD,Substitute Sku,Gingerbread Cookie Topper (Double Pack),DBLPK-GBC,DBLPK-GBC,DBLPK-GBC,OLD - Double Pack - Gingerbread Cookie,OLD - Gingerbread Cookie
+OLD,Substitute Sku,Everything Spicy Seasoning (Double Pack),DBLPK-EVRYSPCY,DBLPK-EVRYSPCY,DBLPK-EVRYSPCY,OLD - Double Pack - Everything Spicy,OLD - Spicy Everything Seasoning
+OLD,Substitute Sku,Everything Seasoning (Double Pack),DBLPK-EVRTNG,DBLPK-EVRTNG,DBLPK-EVRTNG,OLD - Double Pack - Everything,OLD - Everything Seasoning
+OLD,Substitute Sku,"No Salt Seasoning, Everything but the Salt Seasoning (Double Pack) by Flavor God, No Sodium, Natural, Garlic, Chili & Black Pepper, Salt Substitute, Salt Free, Spices with Flavor, Low Sodium Vegan",DBLPK-EBTS,DBLPK-EBTS,DBLPK-EBTS,OLD - Double Pack - Everything but the Salt,OLD - Everything But The Salt
+OLD,Substitute Sku,Cajun Lovers Seasoning (Double Pack),DBLPK-CJNLVRS,DBLPK-CJNLVRS,DBLPK-CJNLVRS,OLD - Double Pack - Cajun Lovers,OLD - Cajun Lovers Seasoning
+OLD,Substitute Sku,Cheese Seasoning (Double Pack),DBLPK-CHS,DBLPK-CHS,DBLPK-CHS,OLD - Double Pack - Cheese,OLD - Cheese Seasoning
+OLD,Substitute Sku,Chipotle Seasoning (Double Pack),DBLPK-CHPTL,DBLPK-CHPTL,DBLPK-CHPTL,OLD - Double Pack - Chipotle,OLD - Chipotle Seasoning
+OLD,Substitute Sku,Buttery Cinnamon Roll Topper (Double Pack),DBLPK-BTRCNMRL,DBLPK-BTRCNMRL,DBLPK-BTRCNMRL,OLD - Double Pack - Buttery Cinnamon Roll,OLD - Buttery Cinnamon Roll
+OLD,Substitute Sku,Buffalo Seasoning (Double Pack),DBLPK-BFLO,DBLPK-BFLO,DBLPK-BFLO,OLD - Double Pack - Buffalo,OLD - Buffalo Seasoning
+OLD,Substitute Sku,Bacon Lovers Seasoning (Double Pack),DBLPK-BCN,DBLPK-BCN,DBLPK-BCN,OLD - Double Pack - Bacon Lovers,OLD - Bacon Lovers Seasoning
+OLD,Need,"Startup Chef Spice Combo Pack of 7 by Flavor God - Herb, Spice and Seasoning Gift Set - Low Sodium",STRTCHFSPCRK-7,,Need,OLD - Startup Chef Spice Rack,OLD - Everything Seasoning
+OLD,Need,Party Combo Pack (3 Set),TPP-PTTR,,Need,OLD - 3 Bottle - The Party Pack,OLD - Pizza Seasoning
+OLD,Need,Buttery Cinnamon Roll Topper (Triple Pack),TRPPK-BTRCNMRL,,Need,OLD - Buttery Cinnamon Roll Triple Pack,OLD - Buttery Cinnamon Roll
+OLD,Need,Vegan Lovers Combo Pack (3 Set),VEG-IZ-TT-CL,,Need,OLD - Vegan Lovers Combo,OLD - Italian Zest Seasoning
+OLD,Need,Wings Combo Pack (4 Set),WNGS-PCK-3,,Need,OLD - Wings Seasoning Pack,OLD - Hot Wings Seasoning
