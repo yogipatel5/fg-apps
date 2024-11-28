@@ -130,3 +130,56 @@ function breakdownInventoryNeeds() {
   const dataRange = breakdownSummarySheet.getDataRange();
   dataRange.createFilter();
 }
+
+function breakdownInventoryBySku(sku) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  // Get reference to needed sheets
+  const standardizedSheet = ss.getSheetByName('Standardized_Breakdown');
+  const breakdownSheet = ss.getSheetByName('Breakdown');
+
+  // Create map for product names
+  const productNameMap = new Map();
+  const breakdownData = breakdownSheet.getDataRange().getValues();
+  for (let i = 1; i < breakdownData.length; i++) {
+    if (breakdownData[i][0] && breakdownData[i][1]) {
+      productNameMap.set(breakdownData[i][0], breakdownData[i][1]);
+    }
+  }
+
+  // Get standardized breakdown
+  const standardizedData = standardizedSheet.getDataRange().getValues();
+  const breakdownMap = new Map();
+
+  // Process only the rows for the specified SKU
+  for (let i = 1; i < standardizedData.length; i++) {
+    const [currentSku, originalName, standardizedName, upc, quantity, type] = standardizedData[i];
+    if (currentSku === sku) {
+      if (!breakdownMap.has(standardizedName)) {
+        breakdownMap.set(standardizedName, {
+          name: standardizedName,
+          upc: upc,
+          quantity: 0,
+          type: type
+        });
+      }
+      breakdownMap.get(standardizedName).quantity += Number(quantity) || 0;
+    }
+  }
+
+  // Convert the breakdown map to an array of components
+  const components = Array.from(breakdownMap.values()).map(item => ({
+    name: item.name,
+    upc: item.upc,
+    quantity: item.quantity,
+    type: item.type
+  }));
+
+  // Return the breakdown information
+  return {
+    sku: sku,
+    productName: productNameMap.get(sku) || 'Unknown Product',
+    components: components
+  };
+}
+
