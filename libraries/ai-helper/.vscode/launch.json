@@ -1,0 +1,13 @@
+// This is the launch.json file for the AI Helper Library for google apps script it will run 'clasp run main'
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Main",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "program": "clasp run main"
+        }
+    ]
+}

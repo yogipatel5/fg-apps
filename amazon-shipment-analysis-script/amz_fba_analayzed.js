@@ -1,58 +1,65 @@
-function processAmazonFBAInventory() {
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-
-    // Get analyzed FBA report data
+function getAnalyzedFBAData(ss) {
     const analyzedSheet = ss.getSheetByName('amz_fba_report_analyzed');
     const analyzedData = analyzedSheet.getDataRange().getValues();
     const headers = analyzedData[0];
 
-    // Find column indices
-    const priorityIndex = headers.indexOf('Priority');
-    const skuIndex = headers.indexOf('SKU');
-    const salesPriorityIndex = headers.indexOf('Sales Priority Level');
-    const recommendedQtyIndex = headers.indexOf('Amazon Recommended Quantity');
-    const dailyAvgSalesIndex = headers.indexOf('Daily Avg Sales ($)');
-    const dailyVelocityIndex = headers.indexOf('Daily Velocity');
-    const availableIndex = headers.indexOf('Available');
+    const indices = {
+        priority: headers.indexOf('Priority'),
+        sku: headers.indexOf('SKU'),
+        salesPriority: headers.indexOf('Sales Priority Level'),
+        recommendedQty: headers.indexOf('Amazon Recommended Quantity'),
+        dailyAvgSales: headers.indexOf('Daily Avg Sales ($)'),
+        dailyVelocity: headers.indexOf('Daily Velocity'),
+        available: headers.indexOf('Available')
+    };
 
-    // Add logging to check the values we're getting from analyzed report
-    console.log('Column indices:', {
-        priority: priorityIndex,
-        sku: skuIndex,
-        salesPriority: salesPriorityIndex,
-        dailyVelocity: dailyVelocityIndex,
-        available: availableIndex
-    });
+    console.log('Column indices:', indices);
 
-    // Create map of SKU to data from analyzed report
     const analyzedDataMap = new Map();
     for (let i = 1; i < analyzedData.length; i++) {
         const row = analyzedData[i];
-        const sku = row[skuIndex];
+        const sku = row[indices.sku];
         const analyzed = {
-            priority: row[priorityIndex],
-            dailyAverageSales: Number(row[dailyAvgSalesIndex]) || 0,
-            dailyVelocity: Number(row[dailyVelocityIndex]) || 0,
-            available: Number(row[availableIndex]) || 0
+            priority: row[indices.priority],
+            dailyAverageSales: Number(row[indices.dailyAvgSales]) || 0,
+            dailyVelocity: Number(row[indices.dailyVelocity]) || 0,
+            available: Number(row[indices.available]) || 0
         };
         analyzedDataMap.set(sku, analyzed);
-        console.log(`Analyzed data for ${sku}:`, analyzed);
     }
 
-    // Get standardized breakdown data for UPCs and product info
+    return { indices, analyzedDataMap };
+}
+function getProductNames(ss) {
+    const amazonProductsSheet = ss.getSheetByName('Amazon_products');
+    const amazonProductsData = amazonProductsSheet.getDataRange().getValues();
+    const amazonHeaders = amazonProductsData[0];
+
+    const skuColumnIndex = amazonHeaders.indexOf('Merchant SKU');
+    const productNameColumnIndex = amazonHeaders.indexOf('Product Name');
+
+    const productNameMap = new Map();
+    for (let i = 1; i < amazonProductsData.length; i++) {
+        const sku = amazonProductsData[i][skuColumnIndex];
+        const productName = amazonProductsData[i][productNameColumnIndex];
+        if (sku && productName) {
+            productNameMap.set(sku, productName);
+        }
+    }
+
+    return productNameMap;
+}
+function getStandardizedBreakdown(ss, productNameMap) {
     const standardizedSheet = ss.getSheetByName('Standardized_Breakdown');
     const standardizedData = standardizedSheet.getDataRange().getValues();
     const productMap = new Map();
 
-    // Create map of SKU to product info
     console.log('Processing Standardized Breakdown data...');
     for (let i = 1; i < standardizedData.length; i++) {
-        const [sku, originalName, standardizedName, upc, quantity, type] = standardizedData[i];
-        console.log(`SKU: ${sku}, Name: ${standardizedName}, UPC: ${upc}, Type: ${type}`);
-
+        const [sku, _, standardizedName, upc, quantity, type] = standardizedData[i];
         if (!productMap.has(sku)) {
             productMap.set(sku, {
-                productName: originalName,
+                productName: productNameMap.get(sku) || 'Unknown Product',
                 seasoningsIncluded: standardizedName,
                 seasoningsIncludedUPC: upc,
                 type: type
@@ -60,88 +67,80 @@ function processAmazonFBAInventory() {
         }
     }
 
-    // Get available inventory
+    return productMap;
+}
+function getInventoryData(ss) {
     const inventorySheet = ss.getSheetByName('Available Inventory');
     const inventoryData = inventorySheet.getDataRange().getValues();
     const inventoryMap = new Map();
 
-    // Create map of UPC to available quantity
     for (let i = 1; i < inventoryData.length; i++) {
         const [item, upc, quantity] = inventoryData[i];
         inventoryMap.set(upc, Number(quantity) || 0);
     }
 
-    // Process analyzed data with additional logging
+    return inventoryMap;
+}
+function processAmazonFBAInventory() {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+    // Get all required data
+    const { indices, analyzedDataMap } = getAnalyzedFBAData(ss);
+    const productNameMap = getProductNames(ss);
+    const productMap = getStandardizedBreakdown(ss, productNameMap);
+    const inventoryMap = getInventoryData(ss);
+
+    // Process analyzed data
+    const analyzedSheet = ss.getSheetByName('amz_fba_report_analyzed');
+    const analyzedData = analyzedSheet.getDataRange().getValues();
+
     const processedProducts = analyzedData.slice(1)
         .map(row => {
-            const sku = row[skuIndex];
+            const sku = row[indices.sku];
             const productInfo = productMap.get(sku);
             const analyzedInfo = analyzedDataMap.get(sku) || {};
 
             if (!productInfo) {
-                console.warn(`Warning: No product info found for SKU ${sku}`);
+                console.warn(`Warning: SKU ${sku} not found in Standardized_Breakdown sheet. Also checked Amazon_products sheet: ${productNameMap.has(sku) ? 'Found' : 'Not Found'}`);
                 return null;
             }
 
-            const product = {
+            return {
                 priority: analyzedInfo.priority,
                 sku: sku,
-                salesPriority: row[salesPriorityIndex],
-                recommendedQty: Number(row[recommendedQtyIndex]) || 0,
+                salesPriority: row[indices.salesPriority],
+                recommendedQty: Number(row[indices.recommendedQty]) || 0,
                 dailyAverageSales: analyzedInfo.dailyAverageSales,
                 dailyVelocity: analyzedInfo.dailyVelocity,
                 available: analyzedInfo.available,
                 ...productInfo
             };
-
-            console.log(`Processed product for ${sku}:`, {
-                dailyVelocity: product.dailyVelocity,
-                available: product.available
-            });
-
-            return product;
         })
         .filter(product => product && product.recommendedQty > 0);
 
-    console.log(`Processed ${processedProducts.length} products`);
-
-    console.log('Before sorting:');
-    processedProducts.forEach(p => {
-        console.log(`${p.sku} - ${p.productName} (${p.salesPriority}, Priority: ${p.priority})`);
-    });
-
-    // Sort products by priority
+    // Sort and process products
     processedProducts.sort((a, b) => {
-        // First by Sales Priority Level (High > Medium > Low)
         const priorityOrder = { 'High': 0, 'Medium': 1, 'Low': 2 };
         if (priorityOrder[a.salesPriority] !== priorityOrder[b.salesPriority]) {
             return priorityOrder[a.salesPriority] - priorityOrder[b.salesPriority];
         }
-        // Then by Daily Average Sales (highest to lowest)
         if (a.dailyAverageSales !== b.dailyAverageSales) {
             return b.dailyAverageSales - a.dailyAverageSales;
         }
-        // Finally by priority number if sales are equal
         return a.priority - b.priority;
     });
 
-    console.log('\nAfter sorting:');
-    processedProducts.forEach(p => {
-        console.log(`${p.sku} - ${p.productName} (${p.salesPriority}, Daily Avg: $${p.dailyAverageSales.toFixed(2)}, Priority: ${p.priority})`);
-    });
-
-    // Process inventory needs
+    // Process inventory and write results
     const results = processInventoryNeeds(processedProducts, inventoryMap);
-
-    // Write results to sheet
     const resultSheet = writeInventoryResults(results);
+    const summarySheet = writeRemainingInventorySummary(results, ss);
 
     return {
         results: results,
-        sheet: resultSheet
+        analysisSheet: resultSheet,
+        summarySheet: summarySheet
     };
 }
-
 function processInventoryNeeds(products, inventoryMap) {
     console.log('Starting processInventoryNeeds');
     console.log('Number of products to process:', products.length);
@@ -154,10 +153,10 @@ function processInventoryNeeds(products, inventoryMap) {
     const updatedInventory = new Map(inventoryMap);
 
     for (const product of products) {
-        console.log(`Processing product ${product.sku}:`, {
-            dailyVelocity: product.dailyVelocity,
-            available: product.available
-        });
+        console.log(`\nProcessing product: ${product.sku}`);
+        console.log(`Type: ${product.type}`);
+        console.log(`Priority: ${product.priority}`);
+        console.log(`Daily Velocity: ${product.dailyVelocity}`);
 
         const result = {
             sku: product.sku,
@@ -178,15 +177,8 @@ function processInventoryNeeds(products, inventoryMap) {
 
         if (productType === 'single') {
             const upc = product.seasoningsIncludedUPC;
-            console.log(`Processing single product ${product.sku}:`);
-            console.log(`- UPC from Amazon_products: ${upc}`);
-            console.log(`- Available in inventory: ${inventoryMap.has(upc)}`);
             if (!upc) {
                 console.warn(`Warning: No UPC found for single product ${product.sku}`);
-                continue;
-            }
-            if (upc.length > 15) {  // Basic UPC validation
-                console.error(`Error: Invalid UPC format for ${product.sku}: ${upc}`);
                 continue;
             }
 
@@ -198,7 +190,8 @@ function processInventoryNeeds(products, inventoryMap) {
             const fulfillable = Math.min(product.recommendedQty, available);
             console.log(`Can fulfill ${fulfillable} out of ${product.recommendedQty} requested`);
 
-            result.canFulfill = fulfillable >= product.recommendedQty;
+            result.canFulfill = fulfillable >= product.recommendedQty ? 'Yes' :
+                fulfillable > 0 ? 'Partial' : 'No';
             result.fulfillableQty = fulfillable;
             result.components.push({
                 name: product.seasoningsIncluded,
@@ -209,10 +202,10 @@ function processInventoryNeeds(products, inventoryMap) {
             });
 
             if (fulfillable > 0) {
-                const remaining = available - fulfillable;
-                updatedInventory.set(upc, remaining);
-                console.log(`Updated inventory for ${upc}: ${remaining}`);
+                updatedInventory.set(upc, available - fulfillable);
+                console.log(`Updated inventory for ${upc}: ${available - fulfillable}`);
             }
+
         } else {
             try {
                 const breakdown = breakdownInventoryBySku(product.sku);
@@ -249,22 +242,20 @@ function processInventoryNeeds(products, inventoryMap) {
                     };
                 });
 
-                result.canFulfill = minFulfillable >= product.recommendedQty;
+                result.canFulfill = minFulfillable >= product.recommendedQty ? 'Yes' :
+                    minFulfillable > 0 ? 'Partial' : 'No';
                 result.fulfillableQty = Math.min(minFulfillable, product.recommendedQty);
                 console.log(`Can fulfill ${result.fulfillableQty} out of ${product.recommendedQty} combo packs`);
 
                 if (result.fulfillableQty > 0) {
                     componentResults.forEach(component => {
                         const used = result.fulfillableQty * component.quantity;
-                        const remaining = component.available - used;
-
                         result.components.push({
                             ...component,
                             used: used
                         });
-
-                        updatedInventory.set(component.upc, remaining);
-                        console.log(`Updated inventory for ${component.upc}: ${remaining}`);
+                        updatedInventory.set(component.upc, component.available - used);
+                        console.log(`Updated inventory for ${component.upc}: ${component.available - used}`);
                     });
                 } else {
                     result.components = componentResults.map(comp => ({
@@ -272,6 +263,7 @@ function processInventoryNeeds(products, inventoryMap) {
                         used: 0
                     }));
                 }
+
             } catch (error) {
                 console.error(`Error processing combo pack ${product.sku}:`, error);
                 continue;
@@ -291,21 +283,9 @@ function processInventoryNeeds(products, inventoryMap) {
         remainingInventory: Object.fromEntries(updatedInventory)
     };
 }
-
 function writeInventoryResults(results) {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
-    let resultSheet = ss.getSheetByName('FBA Inventory Analysis');
-
-    // Clear or create sheet
-    if (resultSheet) {
-        let filter = resultSheet.getFilter();
-        if (filter) {
-            filter.remove();
-        }
-        resultSheet.clear();
-    } else {
-        resultSheet = ss.insertSheet('FBA Inventory Analysis');
-    }
+    const sheetName = 'FBA Inventory Analysis';
 
     // Define headers
     const headers = [
@@ -315,50 +295,36 @@ function writeInventoryResults(results) {
         'SKU',
         'Product Name',
         'Type',
-        'Current Available',    // From amz_fba_report_analyzed
-        'Daily Velocity',       // From amz_fba_report_analyzed
+        'Current Available',
+        'Daily Velocity',
         'Recommended Qty',
         'Can Fulfill?',
         'Fulfillable Qty',
         'Total Available After Shipment',
         'Days of Coverage',
-        'Backorder Risk',       // New column
+        'Backorder Risk',
         'Components',
         'Component Details'
     ];
 
     // Prepare data rows
-    const data = [headers];
-
-    results.results.forEach(result => {
+    const data = results.results.map(result => {
         const componentsList = result.components.map(c => c.name).join('\n');
-
-        // Calculate backorder risk
         const currentAvailable = result.available || 0;
         const dailyVelocity = result.dailyVelocity || 0;
         const fulfillableQty = result.fulfillableQty || 0;
         const totalAfterShipment = currentAvailable + fulfillableQty;
-
-        // Calculate days of coverage including 7-day shipping delay
         const daysOfCoverage = dailyVelocity > 0 ?
-            (totalAfterShipment - (dailyVelocity * 7)) / dailyVelocity :
-            999;
+            (totalAfterShipment - (dailyVelocity * 7)) / dailyVelocity : 999;
 
-        // Determine backorder risk
-        let backorderRisk;
-        if (daysOfCoverage <= 0) {
-            backorderRisk = 'High';
-        } else if (daysOfCoverage <= 14) {
-            backorderRisk = 'Medium';
-        } else {
-            backorderRisk = 'Low';
-        }
+        const backorderRisk = daysOfCoverage <= 0 ? 'High' :
+            daysOfCoverage <= 14 ? 'Medium' : 'Low';
 
-        const componentDetails = result.components.map(c => {
-            return `${c.name}\nNeeded: ${c.needed}\nAvailable: ${c.available}\nUsed: ${c.used}`;
-        }).join('\n\n');
+        const componentDetails = result.components.map(c =>
+            `${c.name}\nNeeded: ${c.needed}\nAvailable: ${c.available}\nUsed: ${c.used}`
+        ).join('\n\n');
 
-        data.push([
+        return [
             result.priority,
             result.salesPriority,
             result.dailyAverageSales || 0,
@@ -368,126 +334,169 @@ function writeInventoryResults(results) {
             currentAvailable,
             dailyVelocity,
             result.recommendedQty,
-            result.canFulfill ? 'Yes' : 'No',
+            result.canFulfill,
             result.fulfillableQty,
             totalAfterShipment,
-            daysOfCoverage.toFixed(1),
+            daysOfCoverage,
             backorderRisk,
             componentsList,
             componentDetails
-        ]);
+        ];
     });
 
+    // Define column formats
+    const columnTypes = {
+        1: 'INTEGER',           // Priority Number
+        3: 'MONEY',            // Daily Avg Sales
+        7: 'INTEGER',          // Current Available
+        8: 'DECIMAL',          // Daily Velocity
+        9: 'INTEGER',          // Recommended Qty
+        11: 'INTEGER',         // Fulfillable Qty
+        12: 'INTEGER',         // Total Available After Shipment
+        13: 'DECIMAL'          // Days of Coverage
+    };
+
+    // Define column widths
+    const columnWidths = {
+        15: 300,  // Components column
+        16: 400   // Component Details column
+    };
+
     // Write data to sheet
-    resultSheet.getRange(1, 1, data.length, headers.length).setValues(data);
+    const sheet = writeDataToSheet(ss, {
+        sheetName,
+        headers,
+        data,
+        clearFirst: true,
+        createIfMissing: true,
+        columnFormats: columnTypes,
+        columnWidths,
+        addFilter: true,
+        frozen: { rows: 1 }
+    });
 
-    // Format sheet
-    resultSheet.autoResizeColumns(1, headers.length);
-    const headerRange = resultSheet.getRange(1, 1, 1, headers.length);
-    headerRange.setBackground('#f3f3f3');
-    headerRange.setFontWeight('bold');
-
-    // Format Daily Avg Sales column as currency
-    const dailyAvgSalesColumn = 3; // Column C
-    const dailyAvgSalesRange = resultSheet.getRange(2, dailyAvgSalesColumn, data.length - 1, 1);
-    dailyAvgSalesRange.setNumberFormat('$#,##0.00');
-
-    // Format Daily Unit Velocity column
-    const velocityColumn = 10;  // Column J
-    const velocityRange = resultSheet.getRange(2, velocityColumn, data.length - 1, 1);
-    velocityRange.setNumberFormat('#,##0.0');
-
-    // Format Weeks of Inventory column
-    const weeksColumn = 11;  // Column K
-    const weeksRange = resultSheet.getRange(2, weeksColumn, data.length - 1, 1);
-    weeksRange.setNumberFormat('#,##0.0');
-
-    // Format Stockout Date column
-    const dateColumn = 12;  // Column L
-    const dateRange = resultSheet.getRange(2, dateColumn, data.length - 1, 1);
-    dateRange.setNumberFormat('MM/dd/yyyy');
-
-    // Add conditional formatting for Can Fulfill column
-    const canFulfillColumn = 8; // Updated column index
-    const canFulfillRange = resultSheet.getRange(2, canFulfillColumn, data.length - 1, 1);
-
-    // Create rules array
+    // Add conditional formatting rules
     const rules = [
-        SpreadsheetApp.newConditionalFormatRule()
-            .whenTextEqualTo('No')
-            .setBackground('#ffcdd2')
-            .setRanges([canFulfillRange])
-            .build(),
-        SpreadsheetApp.newConditionalFormatRule()
-            .whenTextEqualTo('Yes')
-            .setBackground('#c8e6c9')
-            .setRanges([canFulfillRange])
-            .build()
+        // Sales Priority rules
+        {
+            type: 'TEXT_EQ',
+            values: ['High'],
+            background: '#d9ead3',
+            range: sheet.getRange(2, 2, data.length, 1)
+        },
+        {
+            type: 'TEXT_EQ',
+            values: ['Medium'],
+            background: '#fff2cc',
+            range: sheet.getRange(2, 2, data.length, 1)
+        },
+        {
+            type: 'TEXT_EQ',
+            values: ['Low'],
+            background: '#f4c7c3',
+            range: sheet.getRange(2, 2, data.length, 1)
+        },
+        // Can Fulfill rules
+        {
+            type: 'TEXT_EQ',
+            values: ['No'],
+            background: '#ffcdd2',
+            range: sheet.getRange(2, 10, data.length, 1)
+        },
+        {
+            type: 'TEXT_EQ',
+            values: ['Partial'],
+            background: '#fff2cc',
+            range: sheet.getRange(2, 10, data.length, 1)
+        },
+        {
+            type: 'TEXT_EQ',
+            values: ['Yes'],
+            background: '#c8e6c9',
+            range: sheet.getRange(2, 10, data.length, 1)
+        },
+        // Backorder Risk rules
+        {
+            type: 'TEXT_EQ',
+            values: ['High'],
+            background: '#f4c7c3',
+            range: sheet.getRange(2, 14, data.length, 1)
+        },
+        {
+            type: 'TEXT_EQ',
+            values: ['Medium'],
+            background: '#fff2cc',
+            range: sheet.getRange(2, 14, data.length, 1)
+        },
+        {
+            type: 'TEXT_EQ',
+            values: ['Low'],
+            background: '#d9ead3',
+            range: sheet.getRange(2, 14, data.length, 1)
+        }
     ];
 
-    // Apply both rules
-    resultSheet.setConditionalFormatRules(rules);
+    setConditionalFormatting(ss, rules);
 
-    // Add conditional formatting for Weeks of Inventory
-    const weeksRules = [
-        SpreadsheetApp.newConditionalFormatRule()
-            .whenNumberLessThan(2)
-            .setBackground('#f4c7c3')
-            .setRanges([weeksRange])
-            .build(),
-        SpreadsheetApp.newConditionalFormatRule()
-            .whenNumberBetween(2, 4)
-            .setBackground('#fff2cc')
-            .setRanges([weeksRange])
-            .build(),
-        SpreadsheetApp.newConditionalFormatRule()
-            .whenNumberGreaterThan(4)
-            .setBackground('#d9ead3')
-            .setRanges([weeksRange])
-            .build()
-    ];
-
-    // Apply weeks rules
-    resultSheet.setConditionalFormatRules(weeksRules);
-
-    // Add filter
-    resultSheet.getDataRange().createFilter();
-
-    // Set row heights for components columns
-    for (let i = 2; i <= data.length; i++) {
-        const componentsText = String(data[i - 1][14] || '');  // Components column
-        const detailsText = String(data[i - 1][15] || '');     // Component Details column
-
-        const componentsHeight = componentsText.split('\n').length;
-        const detailsHeight = detailsText.split('\n').length;
-
-        const maxHeight = Math.max(componentsHeight, detailsHeight);
-        resultSheet.setRowHeight(i, maxHeight * 15 + 5);
+    // Set row heights based on content
+    const rowHeights = {};
+    for (let i = 2; i <= data.length + 1; i++) {
+        const componentsText = String(data[i - 2][14] || '');
+        const detailsText = String(data[i - 2][15] || '');
+        const maxLines = Math.max(
+            componentsText.split('\n').length,
+            detailsText.split('\n').length
+        );
+        rowHeights[i] = maxLines * 15 + 5;
     }
+    setRowHeights(ss, rowHeights);
 
-    // Add conditional formatting for Backorder Risk
-    const backorderRiskColumn = 14;  // Adjust based on column position
-    const backorderRiskRange = resultSheet.getRange(2, backorderRiskColumn, data.length - 1, 1);
+    return sheet;
+}
+// Remaining inventory left in the system after allocations
+function calculateRemainingInventory(results) {
+    const remainingInventory = new Map();
+    results.remainingInventory.forEach((qty, upc) => {
+        remainingInventory.set(upc, qty);
+    });
+    return remainingInventory;
+}
+function writeRemainingInventorySummary(results, ss) {
+    const sheetName = 'Remaining Inventory Summary';
+    const headers = ['Component Name', 'UPC', 'Remaining Quantity'];
 
-    const backorderRules = [
-        SpreadsheetApp.newConditionalFormatRule()
-            .whenTextEqualTo('High')
-            .setBackground('#f4c7c3')  // Red
-            .setRanges([backorderRiskRange])
-            .build(),
-        SpreadsheetApp.newConditionalFormatRule()
-            .whenTextEqualTo('Medium')
-            .setBackground('#fff2cc')  // Yellow
-            .setRanges([backorderRiskRange])
-            .build(),
-        SpreadsheetApp.newConditionalFormatRule()
-            .whenTextEqualTo('Low')
-            .setBackground('#d9ead3')  // Green
-            .setRanges([backorderRiskRange])
-            .build()
-    ];
+    // Prepare data
+    const remainingInventory = new Map();
+    results.results.forEach(result => {
+        result.components.forEach(component => {
+            const remaining = results.remainingInventory[component.upc] || 0;
+            remainingInventory.set(component.upc, {
+                name: component.name,
+                quantity: remaining
+            });
+        });
+    });
 
-    resultSheet.setConditionalFormatRules(backorderRules);
+    const data = Array.from(remainingInventory).map(([upc, info]) => [
+        info.name,
+        upc,
+        info.quantity
+    ]);
 
-    return resultSheet;
+    // Define column formats
+    const columnTypes = {
+        3: 'INTEGER'  // Remaining Quantity
+    };
+
+    // Write data to sheet
+    return writeDataToSheet(ss, {
+        sheetName,
+        headers,
+        data,
+        clearFirst: true,
+        createIfMissing: true,
+        columnFormats: columnTypes,
+        addFilter: true,
+        frozen: { rows: 1 }
+    });
 }

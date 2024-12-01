@@ -1,0 +1,21 @@
+{
+  "timeZone": "America/New_York",
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "dependencies": {
+    "libraries": [
+      {
+        "userSymbol": "ExportScript",
+        "version": "1",
+        "libraryId": "1CFpIGQmM5r9vnLrfMD4IWDEd6PK9ehKvQ6NZDkIq0tz3WBk__0VHwhih",
+        "developmentMode": false
+      },
+      {
+        "userSymbol": "aihelper",
+        "version": "1",
+        "libraryId": "17AsVkwX0eMmOxB-5mXJMs-4q4BjplUHeXLm2aAIB8JFsXxXjhtzkQd8P",
+        "developmentMode": false
+      }
+    ]
+  }
+}
