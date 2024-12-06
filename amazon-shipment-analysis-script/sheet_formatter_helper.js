@@ -1,56 +1,4 @@
 /**
- * Standard column format types with predefined formats, validations, and alignments
- * @constant {Object}
- */
-const ColumnFormats = {
-    DATE: {
-        format: 'mm/dd/yyyy',
-        validate: 'date',
-        align: 'center'
-    },
-    DATETIME: {
-        format: 'mm/dd/yyyy hh:mm:ss',
-        validate: 'date',
-        align: 'center'
-    },
-    MONEY: {
-        format: '$#,##0.00',
-        validate: 'number',
-        align: 'right'
-    },
-    PERCENTAGE: {
-        format: '0.00%',
-        validate: 'number',
-        align: 'right'
-    },
-    INTEGER: {
-        format: '#,##0',
-        validate: 'number',
-        align: 'right'
-    },
-    DECIMAL: {
-        format: '#,##0.00',
-        validate: 'number',
-        align: 'right'
-    },
-    TEXT: {
-        format: '@',
-        validate: 'text',
-        align: 'left'
-    },
-    EMAIL: {
-        format: '@',
-        validate: 'email',
-        align: 'left'
-    },
-    PHONE: {
-        format: '@',
-        validate: 'phone',
-        align: 'left'
-    }
-};
-
-/**
  * Clears a sheet's content, formatting, filters, and conditional formatting rules
  * @param {SpreadsheetApp.Spreadsheet} ss - The spreadsheet object
  * @param {string} sheetName - Name of the sheet to clear
@@ -92,6 +40,10 @@ function clearSheet(ss, sheetName) {
  * @param {Object} [options.columnWidths] - Width settings for specific columns
  * @param {boolean} [options.addFilter=true] - Whether to add filter to headers
  * @param {Object} [options.frozen] - Frozen rows/columns configuration
+ * @param {boolean} [options.alternateRows=false] - Whether to add alternating row colors
+ * @param {Object} [options.alternateColors] - Colors for alternating rows
+ * @param {Object} [options.headerFormatting] - Formatting for specific headers
+ * @param {number[]} [options.headerFormatting.wrap] - Array of column indices that should wrap
  * @returns {SpreadsheetApp.Sheet|null} - The modified sheet or null if operation failed
  */
 function writeDataToSheet(ss, options) {
@@ -104,7 +56,10 @@ function writeDataToSheet(ss, options) {
         columnFormats,
         columnWidths,
         addFilter = true,
-        frozen = { rows: 1 }
+        frozen = { rows: 1 },
+        alternateRows = false,
+        alternateColors = { even: "#f8f9fa", odd: "#ffffff" },
+        headerFormatting = { wrap: [] }
     } = options;
 
     // Get or create sheet
@@ -128,12 +83,30 @@ function writeDataToSheet(ss, options) {
     const range = sheet.getRange(1, 1, fullData.length, headers.length);
     range.setValues(fullData);
 
+    // Apply header wrapping if specified
+    if (headerFormatting.wrap && headerFormatting.wrap.length > 0) {
+        headerFormatting.wrap.forEach(colIndex => {
+            sheet.getRange(1, colIndex, 1, 1).setWrap(true);
+        });
+        // Adjust this value if needed (currently 40 pixels)
+        sheet.setRowHeight(1, 40);
+    }
+
     // Apply column formats if provided
     if (columnFormats) {
         Object.entries(columnFormats).forEach(([col, format]) => {
             if (data.length > 0) {
-                sheet.getRange(2, parseInt(col), data.length, 1)
-                    .setNumberFormat(format);
+                const range = sheet.getRange(2, parseInt(col), data.length, 1);
+                range.setNumberFormat(format);
+                
+                // Set alignment based on format type
+                if (format === ColumnFormats.INTEGER.format || 
+                    format === ColumnFormats.DECIMAL.format || 
+                    format === ColumnFormats.MONEY.format) {
+                    range.setHorizontalAlignment('right');
+                } else {
+                    range.setHorizontalAlignment('left');
+                }
             }
         });
     }
@@ -153,6 +126,14 @@ function writeDataToSheet(ss, options) {
     // Freeze rows/columns
     if (frozen.rows) sheet.setFrozenRows(frozen.rows);
     if (frozen.columns) sheet.setFrozenColumns(frozen.columns);
+
+    // Add alternating row colors if requested
+    if (alternateRows && data.length > 0) {
+        for (let i = 2; i <= data.length + 1; i++) {
+            const color = i % 2 === 0 ? alternateColors.even : alternateColors.odd;
+            sheet.getRange(i, 1, 1, headers.length).setBackground(color);
+        }
+    }
 
     return sheet;
 }
@@ -188,18 +169,20 @@ function formatSheet(ss) {
  * Applies alternating row colors starting from specified row
  * @param {SpreadsheetApp.Spreadsheet} ss - The spreadsheet object
  * @param {number} [startRow=2] - Row to start alternating colors from
+ * @param {string} [evenColor="#f8f9fa"] - Color for even rows
+ * @param {string} [oddColor="#ffffff"] - Color for odd rows
  * @returns {void}
  */
-function alternateRowColor(ss, startRow = 2) {
+function alternateRowColor(ss, startRow = 2, evenColor = "#f8f9fa", oddColor = "#ffffff") {
     const sheet = ss.getActiveSheet();
     const lastRow = sheet.getLastRow();
     const lastCol = sheet.getLastColumn();
 
     for (let i = startRow; i <= lastRow; i++) {
         if (i % 2 === 0) {
-            sheet.getRange(i, 1, 1, lastCol).setBackground("#f8f9fa");
+            sheet.getRange(i, 1, 1, lastCol).setBackground(evenColor);
         } else {
-            sheet.getRange(i, 1, 1, lastCol).setBackground("#ffffff");
+            sheet.getRange(i, 1, 1, lastCol).setBackground(oddColor);
         }
     }
 }
@@ -260,7 +243,7 @@ function setColumnWidths(ss, widthsMap) {
  * @param {string} rules[].type - Rule type (TEXT_EQ, NUMBER_LESS, etc.)
  * @param {Array} rules[].values - Values for the rule
  * @param {string} rules[].background - Background color to apply
- * @param {Range} rules[].range - Range to apply the rule to
+ * @param {Object} rules[].range - Range specification {startRow, endRow, startCol, endCol}
  * @returns {void}
  */
 function setConditionalFormatting(ss, rules) {
@@ -271,12 +254,21 @@ function setConditionalFormatting(ss, rules) {
 
     const newRules = rules.map(rule => {
         let formatRule;
+        
+        // Convert range specification to actual range from active sheet
+        const range = sheet.getRange(
+            rule.range.startRow,
+            rule.range.startCol,
+            rule.range.endRow - rule.range.startRow + 1,
+            rule.range.endCol - rule.range.startCol + 1
+        );
 
         switch (rule.type) {
             case "TEXT_EQ":
                 formatRule = SpreadsheetApp.newConditionalFormatRule()
                     .whenTextEqualTo(rule.values[0])
-                    .setBackground(rule.background);
+                    .setBackground(rule.background)
+                    .build();
                 break;
             case "NUMBER_LESS":
                 formatRule = SpreadsheetApp.newConditionalFormatRule()
@@ -295,10 +287,12 @@ function setConditionalFormatting(ss, rules) {
                 break;
         }
 
-        return formatRule.setRanges([rule.range]).build();
-    });
-
-    sheet.setConditionalFormatRules(newRules);
+        return formatRule ? formatRule.setRanges([range]) : null;
+    }).filter(rule => rule !== null);
+    
+    if (newRules.length > 0) {
+        sheet.setConditionalFormatRules(newRules);
+    }
 }
 
 /**

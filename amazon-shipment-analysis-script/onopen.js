@@ -6,5 +6,6 @@ function onOpen() {
     .addItem('3. Create Warehouse Shipment Request', 'createWarehouseShipmentRequest')
     .addItem('Export All Sheets to CSV', 'exportSheetsToCSV')
     .addItem('Internal-ProcessAmazonReport', 'processAmazonFBAReportWithAmazonPriority')
+    .addItem('TestLabel', 'testLabel')
     .addToUi();
 }

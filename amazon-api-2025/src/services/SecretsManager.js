@@ -72,7 +72,6 @@ function clearSecrets() {
   }
 }
 
-// Function to verify secrets are properly stored
 function verifySecrets() {
   try {
     const secrets = getSecrets();
@@ -89,7 +88,6 @@ function verifySecrets() {
   }
 }
 
-// Function to display secrets in a redacted format
 function displayRedactedSecrets() {
   const secrets = getSecrets();
   

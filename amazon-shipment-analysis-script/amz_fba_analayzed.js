@@ -1,3 +1,137 @@
+const debug = false;
+const { ColumnFormats } = initialize();
+
+function logit(message) {
+    if (debug) {
+        console.log(message);
+    }
+}
+
+// Define column configuration using the ColumnFormats from sheet_formatter_helper.js
+const COLUMNS = {
+    SALES_PRIORITY: {
+        header: 'Sales Priority',
+        index: 1,
+        format: ColumnFormats.TEXT.format,  // This will use the ColumnFormats from sheet_formatter_helper.js
+        width: null,
+        conditionalFormatting: [
+            { value: 'Low', background: '#d9ead3' },    // Green
+            { value: 'Medium', background: '#fff2cc' },  // Yellow
+            { value: 'High', background: '#f4c7c3' }    // Red
+        ]
+    },
+    PRIORITY_NUMBER: {
+        header: 'Priority Number',
+        index: 2,
+        format: ColumnFormats.INTEGER.format
+    },
+    DAILY_AVG_SALES: {
+        header: 'Daily Avg Sales ($)',
+        index: 3,
+        format: ColumnFormats.MONEY.format
+    },
+    SKU: {
+        header: 'SKU',
+        index: 4,
+        format: ColumnFormats.TEXT.format
+    },
+    PRODUCT_NAME: {
+        header: 'Product Name',
+        index: 5,
+        format: ColumnFormats.TEXT.format
+    },
+    TYPE: {
+        header: 'Type',
+        index: 6,
+        format: ColumnFormats.TEXT.format
+    },
+    CURRENT_AVAILABLE: {
+        header: 'Current Available',
+        index: 7,
+        format: ColumnFormats.INTEGER.format
+    },
+    DAILY_VELOCITY: {
+        header: 'Daily Velocity',
+        index: 8,
+        format: ColumnFormats.DECIMAL.format
+    },
+    RECOMMENDED_QTY: {
+        header: 'Recommended Qty',
+        index: 9,
+        format: ColumnFormats.INTEGER.format
+    },
+    SCHEDULED_QTY: {
+        header: 'Scheduled Qty',
+        index: 10,
+        format: ColumnFormats.INTEGER.format
+    },
+    TOTAL_AVAILABLE: {
+        header: 'Total Available After Shipment',
+        index: 11,
+        format: ColumnFormats.INTEGER.format
+    },
+    CAN_FULFILL: {
+        header: 'Can Fulfill?',
+        index: 12,
+        format: ColumnFormats.TEXT.format,
+        width: 150,
+        conditionalFormatting: [
+            { value: 'Yes', background: '#d9ead3' },     // Green
+            { value: 'Partial', background: '#fff2cc' }, // Yellow
+            { value: 'No', background: '#f4c7c3' }       // Red
+        ]
+    },
+    BACKORDER_RISK: {
+        header: 'Backorder Risk',
+        index: 13,
+        format: ColumnFormats.TEXT.format,
+        conditionalFormatting: [
+            { value: 'Low', background: '#d9ead3' },    // Green
+            { value: 'Medium', background: '#fff2cc' },  // Yellow
+            { value: 'High', background: '#f4c7c3' }    // Red
+        ]
+    },
+    FULFILLABLE_QTY: {
+        header: 'Fulfillable Qty',
+        index: 14,
+        format: ColumnFormats.INTEGER.format
+    },
+    DAYS_OF_COVERAGE: {
+        header: 'Days of Coverage',
+        index: 15,
+        format: ColumnFormats.DECIMAL.format
+    },
+    NUMBER_OF_COMPONENTS: {
+        header: 'No. of Components',
+        index: 16,
+        format: ColumnFormats.INTEGER.format,
+        conditionalFormatting: [
+            { value: '1', background: '#d9ead3' },    // Green for single component
+            { value: '2', background: '#fff2cc' },   // Yellow for 2 components
+            { value: '3', background: '#f4c7c3' }    // Red for 3 or more components
+        ]
+    },
+    COMPONENTS: {
+        header: 'Components',
+        index: 17,
+        format: ColumnFormats.TEXT.format,
+        width: 300
+    },
+    COMPONENT_DETAILS: {
+        header: 'Component Details',
+        index: 18,
+        format: ColumnFormats.TEXT.format,
+        width: 300,
+        hidden: true
+    },
+    TOTAL_WEIGHT_OZ: {
+        header: 'Total Weight (oz)',
+        index: 19,
+        format: ColumnFormats.DECIMAL.format,
+        width: 120
+    }
+};
+
 function getAnalyzedFBAData(ss) {
     const analyzedSheet = ss.getSheetByName('amz_fba_report_analyzed');
     const analyzedData = analyzedSheet.getDataRange().getValues();
@@ -13,7 +147,7 @@ function getAnalyzedFBAData(ss) {
         available: headers.indexOf('Available')
     };
 
-    console.log('Column indices:', indices);
+    logit('Column indices:', indices);
 
     const analyzedDataMap = new Map();
     for (let i = 1; i < analyzedData.length; i++) {
@@ -52,17 +186,22 @@ function getProductNames(ss) {
 function getStandardizedBreakdown(ss, productNameMap) {
     const standardizedSheet = ss.getSheetByName('Standardized_Breakdown');
     const standardizedData = standardizedSheet.getDataRange().getValues();
+    const headers = standardizedData[0];
+    const weightIndex = headers.indexOf('Weight_Oz');
     const productMap = new Map();
 
-    console.log('Processing Standardized Breakdown data...');
+    logit('Processing Standardized Breakdown data...');
     for (let i = 1; i < standardizedData.length; i++) {
         const [sku, _, standardizedName, upc, quantity, type] = standardizedData[i];
+        const weight = Number(standardizedData[i][weightIndex]) || 0;
+
         if (!productMap.has(sku)) {
             productMap.set(sku, {
                 productName: productNameMap.get(sku) || 'Unknown Product',
                 seasoningsIncluded: standardizedName,
                 seasoningsIncludedUPC: upc,
-                type: type
+                type: type,
+                weight: weight
             });
         }
     }
@@ -80,6 +219,46 @@ function getInventoryData(ss) {
     }
 
     return inventoryMap;
+}
+function getScheduledQuantities(ss) {
+    const shipmentsSheet = ss.getSheetByName('Shipments_to_Amazon');
+    if (!shipmentsSheet) {
+        console.warn('Shipments_to_Amazon sheet not found');
+        return new Map();
+    }
+
+    const shipmentData = shipmentsSheet.getDataRange().getValues();
+    const headers = shipmentData[0];
+
+    const indices = {
+        status: headers.indexOf('Status'),
+        sku: headers.indexOf('Merchant SKU'),
+        quantity: headers.indexOf('Quantity')
+    };
+
+    // Skip if required columns not found
+    if (indices.status === -1 || indices.sku === -1 || indices.quantity === -1) {
+        console.warn('Required columns not found in Shipments_to_Amazon sheet');
+        return new Map();
+    }
+
+    const scheduledQty = new Map();
+
+    // Start from 1 to skip headers
+    for (let i = 1; i < shipmentData.length; i++) {
+        const row = shipmentData[i];
+        const status = row[indices.status];
+        const sku = row[indices.sku];
+        const quantity = Number(row[indices.quantity]) || 0;
+
+        // Only count items in 'Prep' status
+        if (status === 'Prep') {
+            const currentQty = scheduledQty.get(sku) || 0;
+            scheduledQty.set(sku, currentQty + quantity);
+        }
+    }
+
+    return scheduledQty;
 }
 function processAmazonFBAInventory() {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -142,27 +321,56 @@ function processAmazonFBAInventory() {
     };
 }
 function processInventoryNeeds(products, inventoryMap) {
-    console.log('Starting processInventoryNeeds');
-    console.log('Number of products to process:', products.length);
-    console.log('Initial inventory state:');
+    logit('Starting processInventoryNeeds');
+    logit('Number of products to process:', products.length);
+    logit('Initial inventory state:');
     inventoryMap.forEach((qty, upc) => {
-        console.log(`UPC: ${upc}, Quantity: ${qty}`);
+        logit(`UPC: ${upc}, Quantity: ${qty}`);
     });
 
     const results = [];
     const updatedInventory = new Map(inventoryMap);
 
+    // Get scheduled quantities
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const scheduledQty = getScheduledQuantities(ss);
+
+    function roundToPackSize(quantity, type) {
+        if (quantity < 10) return quantity; // Minimum threshold
+
+        if (type.toLowerCase() === 'single') {
+            // Round down to nearest multiple of 60
+            return Math.floor(quantity / 60) * 60 || 10;
+        } else if (type.toLowerCase() === 'combo') {
+            // Round down to nearest multiple of 8
+            return Math.floor(quantity / 8) * 8 || 10;
+        }
+        return quantity;
+    }
+
+    function calculateFulfillmentStatus(fulfillable, recommended) {
+        const fulfillmentRatio = recommended > 0 ? fulfillable / recommended : 0;
+        if (fulfillmentRatio >= 0.9) return 'Yes';  // 90% or more
+        if (fulfillmentRatio > 0) return 'Partial';
+        return 'No';
+    }
+
     for (const product of products) {
-        console.log(`\nProcessing product: ${product.sku}`);
-        console.log(`Type: ${product.type}`);
-        console.log(`Priority: ${product.priority}`);
-        console.log(`Daily Velocity: ${product.dailyVelocity}`);
+        logit(`\nProcessing product: ${product.sku}`);
+        logit(`Type: ${product.type}`);
+        logit(`Priority: ${product.priority}`);
+        logit(`Daily Velocity: ${product.dailyVelocity}`);
+
+        const scheduled = scheduledQty.get(product.sku) || 0;
+        const adjustedRecommendedQty = Math.max(0, product.recommendedQty - scheduled);
 
         const result = {
             sku: product.sku,
             productName: product.productName,
             type: product.type || 'single',
             recommendedQty: product.recommendedQty,
+            scheduledQty: scheduled,
+            adjustedRecommendedQty,
             salesPriority: product.salesPriority,
             priority: product.priority,
             dailyAverageSales: product.dailyAverageSales,
@@ -170,6 +378,7 @@ function processInventoryNeeds(products, inventoryMap) {
             available: product.available,
             canFulfill: false,
             fulfillableQty: 0,
+            totalWeightOz: 0,
             components: []
         };
 
@@ -183,28 +392,32 @@ function processInventoryNeeds(products, inventoryMap) {
             }
 
             const available = updatedInventory.get(upc) || 0;
-            console.log(`Single product ${product.sku} (${product.productName})`);
-            console.log(`UPC: ${upc}`);
-            console.log(`Available inventory: ${available}`);
+            logit(`Single product ${product.sku} (${product.productName})`);
+            logit(`UPC: ${upc}`);
+            logit(`Available inventory: ${available}`);
 
-            const fulfillable = Math.min(product.recommendedQty, available);
-            console.log(`Can fulfill ${fulfillable} out of ${product.recommendedQty} requested`);
+            let fulfillable = Math.min(adjustedRecommendedQty, available);
+            // Round to pack size
+            fulfillable = roundToPackSize(fulfillable, 'single');
 
-            result.canFulfill = fulfillable >= product.recommendedQty ? 'Yes' :
-                fulfillable > 0 ? 'Partial' : 'No';
+            logit(`Can fulfill ${fulfillable} out of ${adjustedRecommendedQty} requested (after accounting for ${scheduled} scheduled)`);
+
+            result.canFulfill = calculateFulfillmentStatus(fulfillable, adjustedRecommendedQty);
             result.fulfillableQty = fulfillable;
             result.components.push({
                 name: product.seasoningsIncluded,
                 upc: upc,
-                needed: product.recommendedQty,
+                needed: adjustedRecommendedQty,
                 available: available,
                 used: fulfillable
             });
 
             if (fulfillable > 0) {
                 updatedInventory.set(upc, available - fulfillable);
-                console.log(`Updated inventory for ${upc}: ${available - fulfillable}`);
+                logit(`Updated inventory for ${upc}: ${available - fulfillable}`);
             }
+
+            result.totalWeightOz = product.weight || 0;
 
         } else {
             try {
@@ -214,23 +427,30 @@ function processInventoryNeeds(products, inventoryMap) {
                     continue;
                 }
 
-                console.log(`Combo pack ${product.sku} components:`);
+                // Calculate total weight from all components
+                let totalWeight = 0;
+                breakdown.components.forEach(comp => {
+                    const componentInfo = getComponentInfo(comp.upc);
+                    if (componentInfo && componentInfo.weight) {
+                        totalWeight += (componentInfo.weight * comp.quantity);
+                    }
+                });
+
+                // Add packaging weight for combo
+                result.totalWeightOz = totalWeight + 0.43;
+
+                logit(`Combo pack ${product.sku} components:`);
                 breakdown.components.forEach(comp => {
                     const available = updatedInventory.get(comp.upc) || 0;
-                    console.log(`- ${comp.name} (${comp.upc}): ${available} available`);
+                    logit(`- ${comp.name} (${comp.upc}): ${available} available`);
                 });
 
                 let minFulfillable = Infinity;
                 const componentResults = breakdown.components.map(component => {
                     const available = updatedInventory.get(component.upc) || 0;
-                    const needed = product.recommendedQty * component.quantity;
+                    const needed = adjustedRecommendedQty * component.quantity;
                     const fulfillable = Math.floor(available / component.quantity);
                     minFulfillable = Math.min(minFulfillable, fulfillable);
-
-                    console.log(`Component ${component.name}:`);
-                    console.log(`- Available: ${available}`);
-                    console.log(`- Needed: ${needed}`);
-                    console.log(`- Can fulfill: ${fulfillable}`);
 
                     return {
                         name: component.name,
@@ -242,20 +462,22 @@ function processInventoryNeeds(products, inventoryMap) {
                     };
                 });
 
-                result.canFulfill = minFulfillable >= product.recommendedQty ? 'Yes' :
-                    minFulfillable > 0 ? 'Partial' : 'No';
-                result.fulfillableQty = Math.min(minFulfillable, product.recommendedQty);
-                console.log(`Can fulfill ${result.fulfillableQty} out of ${product.recommendedQty} combo packs`);
+                // Round to pack size for combo
+                let finalFulfillable = Math.min(minFulfillable, adjustedRecommendedQty);
+                finalFulfillable = roundToPackSize(finalFulfillable, 'combo');
 
-                if (result.fulfillableQty > 0) {
+                result.canFulfill = calculateFulfillmentStatus(finalFulfillable, adjustedRecommendedQty);
+                result.fulfillableQty = finalFulfillable;
+
+                if (finalFulfillable > 0) {
                     componentResults.forEach(component => {
-                        const used = result.fulfillableQty * component.quantity;
+                        const used = finalFulfillable * component.quantity;
                         result.components.push({
                             ...component,
                             used: used
                         });
                         updatedInventory.set(component.upc, component.available - used);
-                        console.log(`Updated inventory for ${component.upc}: ${component.available - used}`);
+                        logit(`Updated inventory for ${component.upc}: ${component.available - used}`);
                     });
                 } else {
                     result.components = componentResults.map(comp => ({
@@ -273,49 +495,71 @@ function processInventoryNeeds(products, inventoryMap) {
         results.push(result);
     }
 
-    console.log('\nFinal inventory state:');
-    updatedInventory.forEach((qty, upc) => {
-        console.log(`UPC: ${upc}, Quantity: ${qty}`);
-    });
-
     return {
         results: results,
         remainingInventory: Object.fromEntries(updatedInventory)
     };
 }
+
+// Add this new helper function to get component information
+function getComponentInfo(upc) {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const standardizedSheet = ss.getSheetByName('Standardized_Breakdown');
+    const data = standardizedSheet.getDataRange().getValues();
+    const headers = data[0];
+
+    const upcIndex = headers.indexOf('UPC');
+    const weightIndex = headers.indexOf('Weight_Oz');
+
+    if (upcIndex === -1 || weightIndex === -1) {
+        console.warn('Required columns not found in Standardized_Breakdown');
+        return null;
+    }
+
+    for (let i = 1; i < data.length; i++) {
+        if (data[i][upcIndex] === upc) {
+            return {
+                weight: Number(data[i][weightIndex]) || 0
+            };
+        }
+    }
+
+    return null;
+}
+
 function writeInventoryResults(results) {
+    const { ColumnFormats } = initialize();
+
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const sheetName = 'FBA Inventory Analysis';
 
-    // Define headers
-    const headers = [
-        'Priority Number',
-        'Sales Priority',
-        'Daily Avg Sales ($)',
-        'SKU',
-        'Product Name',
-        'Type',
-        'Current Available',
-        'Daily Velocity',
-        'Recommended Qty',
-        'Can Fulfill?',
-        'Fulfillable Qty',
-        'Total Available After Shipment',
-        'Days of Coverage',
-        'Backorder Risk',
-        'Components',
-        'Component Details'
-    ];
+    // Get scheduled quantities
+    const scheduledQty = getScheduledQuantities(ss);
+
+    // Generate headers from column config
+    const headers = Object.values(COLUMNS).map(col => col.header);
 
     // Prepare data rows
     const data = results.results.map(result => {
-        const componentsList = result.components.map(c => c.name).join('\n');
-        const currentAvailable = result.available || 0;
-        const dailyVelocity = result.dailyVelocity || 0;
-        const fulfillableQty = result.fulfillableQty || 0;
-        const totalAfterShipment = currentAvailable + fulfillableQty;
+        // Format components with quantities
+        const componentsList = result.components.map(c =>
+            `${c.name} (${c.quantity || 1}x)`
+        ).join('\n');
+
+        // Add a summary line with total component count
+        const totalComponents = result.components.length;
+        const componentSummary = `${totalComponents} component${totalComponents > 1 ? 's' : ''}`;
+        const fullComponentsList = `${componentSummary}\n${componentsList}`;
+
+        const currentAvailable = Number(result.available) || 0;
+        const dailyVelocity = Number(result.dailyVelocity) || 0;
+        const fulfillableQty = Number(result.fulfillableQty) || 0;
+        const scheduled = scheduledQty.get(result.sku) || 0;
+        const totalAfterShipment = currentAvailable + fulfillableQty + scheduled;
+
         const daysOfCoverage = dailyVelocity > 0 ?
-            (totalAfterShipment - (dailyVelocity * 7)) / dailyVelocity : 999;
+            Math.round((totalAfterShipment - (dailyVelocity * 7)) / dailyVelocity) :
+            999;
 
         const backorderRisk = daysOfCoverage <= 0 ? 'High' :
             daysOfCoverage <= 14 ? 'Medium' : 'Low';
@@ -324,43 +568,66 @@ function writeInventoryResults(results) {
             `${c.name}\nNeeded: ${c.needed}\nAvailable: ${c.available}\nUsed: ${c.used}`
         ).join('\n\n');
 
-        return [
-            result.priority,
-            result.salesPriority,
-            result.dailyAverageSales || 0,
-            result.sku,
-            result.productName,
-            result.type,
-            currentAvailable,
-            dailyVelocity,
-            result.recommendedQty,
-            result.canFulfill,
-            result.fulfillableQty,
-            totalAfterShipment,
-            daysOfCoverage,
-            backorderRisk,
-            componentsList,
-            componentDetails
-        ];
+        // Create row data using column configuration
+        const rowData = new Array(Object.keys(COLUMNS).length);
+        rowData[COLUMNS.SALES_PRIORITY.index - 1] = result.salesPriority || '';
+        rowData[COLUMNS.PRIORITY_NUMBER.index - 1] = parseInt(result.priority) || 0;
+        rowData[COLUMNS.DAILY_AVG_SALES.index - 1] = Number(result.dailyAverageSales) || 0;
+        rowData[COLUMNS.SKU.index - 1] = result.sku || '';
+        rowData[COLUMNS.PRODUCT_NAME.index - 1] = result.productName || '';
+        rowData[COLUMNS.TYPE.index - 1] = result.type || '';
+        rowData[COLUMNS.CURRENT_AVAILABLE.index - 1] = currentAvailable;
+        rowData[COLUMNS.DAILY_VELOCITY.index - 1] = dailyVelocity;
+        rowData[COLUMNS.RECOMMENDED_QTY.index - 1] = Number(result.recommendedQty) || 0;
+        rowData[COLUMNS.SCHEDULED_QTY.index - 1] = scheduled;
+        rowData[COLUMNS.TOTAL_AVAILABLE.index - 1] = totalAfterShipment;
+        rowData[COLUMNS.CAN_FULFILL.index - 1] = result.canFulfill || 'No';
+        rowData[COLUMNS.BACKORDER_RISK.index - 1] = backorderRisk;
+        rowData[COLUMNS.FULFILLABLE_QTY.index - 1] = fulfillableQty;
+        rowData[COLUMNS.DAYS_OF_COVERAGE.index - 1] = daysOfCoverage;
+        rowData[COLUMNS.NUMBER_OF_COMPONENTS.index - 1] = totalComponents;
+        rowData[COLUMNS.COMPONENTS.index - 1] = componentsList;
+        rowData[COLUMNS.COMPONENT_DETAILS.index - 1] = componentDetails;
+        rowData[COLUMNS.TOTAL_WEIGHT_OZ.index - 1] = result.totalWeightOz || 0;
+
+        return rowData;
     });
 
-    // Define column formats
-    const columnTypes = {
-        1: 'INTEGER',           // Priority Number
-        3: 'MONEY',            // Daily Avg Sales
-        7: 'INTEGER',          // Current Available
-        8: 'DECIMAL',          // Daily Velocity
-        9: 'INTEGER',          // Recommended Qty
-        11: 'INTEGER',         // Fulfillable Qty
-        12: 'INTEGER',         // Total Available After Shipment
-        13: 'DECIMAL'          // Days of Coverage
-    };
+    // Generate column formats
+    const columnFormats = {};
+    Object.values(COLUMNS).forEach(col => {
+        if (col.format) {
+            columnFormats[col.index] = col.format;
+        }
+    });
 
-    // Define column widths
-    const columnWidths = {
-        15: 300,  // Components column
-        16: 400   // Component Details column
-    };
+    // Generate column widths
+    const columnWidths = {};
+    Object.values(COLUMNS).forEach(col => {
+        if (col.width) {
+            columnWidths[col.index] = col.width;
+        }
+    });
+
+    // Generate conditional formatting rules
+    const rules = [];
+    Object.values(COLUMNS).forEach(col => {
+        if (col.conditionalFormatting) {
+            col.conditionalFormatting.forEach(rule => {
+                rules.push({
+                    type: 'TEXT_EQ',
+                    values: [rule.value],
+                    background: rule.background,
+                    range: {
+                        startRow: 2,
+                        startCol: col.index,
+                        endRow: data.length + 1,
+                        endCol: col.index
+                    }
+                });
+            });
+        }
+    });
 
     // Write data to sheet
     const sheet = writeDataToSheet(ss, {
@@ -369,87 +636,56 @@ function writeInventoryResults(results) {
         data,
         clearFirst: true,
         createIfMissing: true,
-        columnFormats: columnTypes,
+        columnFormats,
         columnWidths,
         addFilter: true,
-        frozen: { rows: 1 }
+        frozen: { rows: 1 },
+        alternateRows: true,
+        alternateColors: {
+            even: "#f3f3f3",
+            odd: "#ffffff"
+        },
+        headerFormatting: {
+            wrap: Object.values(COLUMNS).map(col => col.index)  // Wrap all headers
+        }
     });
 
-    // Add conditional formatting rules
-    const rules = [
-        // Sales Priority rules
-        {
-            type: 'TEXT_EQ',
-            values: ['High'],
-            background: '#d9ead3',
-            range: sheet.getRange(2, 2, data.length, 1)
-        },
-        {
-            type: 'TEXT_EQ',
-            values: ['Medium'],
-            background: '#fff2cc',
-            range: sheet.getRange(2, 2, data.length, 1)
-        },
-        {
-            type: 'TEXT_EQ',
-            values: ['Low'],
-            background: '#f4c7c3',
-            range: sheet.getRange(2, 2, data.length, 1)
-        },
-        // Can Fulfill rules
-        {
-            type: 'TEXT_EQ',
-            values: ['No'],
-            background: '#ffcdd2',
-            range: sheet.getRange(2, 10, data.length, 1)
-        },
-        {
-            type: 'TEXT_EQ',
-            values: ['Partial'],
-            background: '#fff2cc',
-            range: sheet.getRange(2, 10, data.length, 1)
-        },
-        {
-            type: 'TEXT_EQ',
-            values: ['Yes'],
-            background: '#c8e6c9',
-            range: sheet.getRange(2, 10, data.length, 1)
-        },
-        // Backorder Risk rules
-        {
-            type: 'TEXT_EQ',
-            values: ['High'],
-            background: '#f4c7c3',
-            range: sheet.getRange(2, 14, data.length, 1)
-        },
-        {
-            type: 'TEXT_EQ',
-            values: ['Medium'],
-            background: '#fff2cc',
-            range: sheet.getRange(2, 14, data.length, 1)
-        },
-        {
-            type: 'TEXT_EQ',
-            values: ['Low'],
-            background: '#d9ead3',
-            range: sheet.getRange(2, 14, data.length, 1)
+    // Hide columns marked as hidden
+    Object.values(COLUMNS).forEach(col => {
+        if (col.hidden) {
+            sheet.hideColumns(col.index);
         }
-    ];
+    });
 
-    setConditionalFormatting(ss, rules);
-
-    // Set row heights based on content
-    const rowHeights = {};
-    for (let i = 2; i <= data.length + 1; i++) {
-        const componentsText = String(data[i - 2][14] || '');
-        const detailsText = String(data[i - 2][15] || '');
-        const maxLines = Math.max(
-            componentsText.split('\n').length,
-            detailsText.split('\n').length
+    // Apply conditional formatting
+    sheet.clearConditionalFormatRules();
+    rules.forEach(rule => {
+        const range = sheet.getRange(
+            rule.range.startRow,
+            rule.range.startCol,
+            rule.range.endRow - rule.range.startRow + 1,
+            rule.range.endCol - rule.range.startCol + 1
         );
-        rowHeights[i] = maxLines * 15 + 5;
-    }
-    setRowHeights(ss, rowHeights);
+
+        const formatRule = SpreadsheetApp.newConditionalFormatRule()
+            .whenTextEqualTo(rule.values[0])
+            .setBackground(rule.background)
+            .setRanges([range])
+            .build();
+
+        const currentRules = sheet.getConditionalFormatRules();
+        currentRules.push(formatRule);
+        sheet.setConditionalFormatRules(currentRules);
+    });
+
+    // Add component details as notes
+    data.forEach((row, index) => {
+        const componentDetails = row[COLUMNS.COMPONENT_DETAILS.index - 1];
+        if (componentDetails) {
+            const cell = sheet.getRange(index + 2, COLUMNS.CAN_FULFILL.index);
+            cell.setNote(componentDetails);
+        }
+    });
 
     return sheet;
 }
@@ -462,20 +698,31 @@ function calculateRemainingInventory(results) {
     return remainingInventory;
 }
 function writeRemainingInventorySummary(results, ss) {
+    if (!results || !results.results) {
+        console.error('No results data provided to writeRemainingInventorySummary');
+        return null;
+    }
+
     const sheetName = 'Remaining Inventory Summary';
     const headers = ['Component Name', 'UPC', 'Remaining Quantity'];
 
     // Prepare data
     const remainingInventory = new Map();
-    results.results.forEach(result => {
-        result.components.forEach(component => {
-            const remaining = results.remainingInventory[component.upc] || 0;
-            remainingInventory.set(component.upc, {
-                name: component.name,
-                quantity: remaining
-            });
+
+    // Safely access the results
+    if (Array.isArray(results.results)) {
+        results.results.forEach(result => {
+            if (result.components && Array.isArray(result.components)) {
+                result.components.forEach(component => {
+                    const remaining = results.remainingInventory[component.upc] || 0;
+                    remainingInventory.set(component.upc, {
+                        name: component.name,
+                        quantity: remaining
+                    });
+                });
+            }
         });
-    });
+    }
 
     const data = Array.from(remainingInventory).map(([upc, info]) => [
         info.name,
@@ -488,6 +735,11 @@ function writeRemainingInventorySummary(results, ss) {
         3: 'INTEGER'  // Remaining Quantity
     };
 
+    // If no spreadsheet provided, get active spreadsheet
+    if (!ss) {
+        ss = SpreadsheetApp.getActiveSpreadsheet();
+    }
+
     // Write data to sheet
     return writeDataToSheet(ss, {
         sheetName,
@@ -499,4 +751,8 @@ function writeRemainingInventorySummary(results, ss) {
         addFilter: true,
         frozen: { rows: 1 }
     });
+}
+
+function runAnalysis() {
+    return processAmazonFBAInventory();
 }
