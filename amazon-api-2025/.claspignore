@@ -1,0 +1,14 @@
+# Ignore all files by default
+**/**
+
+# Include specific files and directories
+!appsscript.json
+!src/**/*.js
+!src/**/*.html
+!src/**/*.gs
+
+# Exclude any potential development/build artifacts
+node_modules/
+.git/
+.DS_Store
+*.log

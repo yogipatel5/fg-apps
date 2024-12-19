@@ -1,6 +1,6 @@
-// File: Access.gs
+// File: Access.js
+// Core SP-API Authentication functionality
 
-// Cache keys
 const CACHE_KEYS = {
   ACCESS_TOKEN: "SP_ACCESS_TOKEN",
   TOKEN_EXPIRY: "SP_TOKEN_EXPIRY"
@@ -22,13 +22,13 @@ function getAccessToken() {
   return refreshAccessToken();
 }
 
-// Modified refreshAccessToken in Access.gs
 function refreshAccessToken() {
+  const secrets = getSecrets();
   const payload = {
     grant_type: "refresh_token",
-    client_id: CONFIG.clientId,
-    client_secret: CONFIG.clientSecret,
-    refresh_token: CONFIG.refreshToken,
+    client_id: secrets.clientId,
+    client_secret: secrets.clientSecret,
+    refresh_token: secrets.refreshToken,
   };
   
   const options = {
@@ -41,7 +41,7 @@ function refreshAccessToken() {
   };
 
   try {
-    const response = UrlFetchApp.fetch(CONFIG.endpoints.token, options);
+    const response = UrlFetchApp.fetch(secrets.endpoints.token, options);
     const responseCode = response.getResponseCode();
     
     if (responseCode !== 200) {
@@ -55,13 +55,7 @@ function refreshAccessToken() {
       throw new Error("No access token in response: " + JSON.stringify(data));
     }
 
-    // Update refresh token if a new one is provided
-    if (data.refresh_token && data.refresh_token !== CONFIG.refreshToken) {
-      updateRefreshToken(data.refresh_token);
-      Logger.log("New refresh token saved");
-    }
-    
-    // Cache the new access token
+    // Cache the new token
     const cache = CacheService.getScriptCache();
     const expiresIn = data.expires_in || 3600;
     const expiryTime = new Date().getTime() + (expiresIn * 1000);
@@ -83,35 +77,8 @@ function refreshAccessToken() {
   }
 }
 
-
 function clearTokenCache() {
   const cache = CacheService.getScriptCache();
   cache.removeAll([CACHE_KEYS.ACCESS_TOKEN, CACHE_KEYS.TOKEN_EXPIRY]);
   Logger.log("Token cache cleared");
-}
-
-// Test functions
-function testAccessToken() {
-  try {
-    const token = getAccessToken();
-    Logger.log("Access token obtained successfully");
-    Logger.log("Token: " + token.substring(0, 10) + "...");
-    return token;
-  } catch (error) {
-    Logger.log("Error in testAccessToken: " + error);
-    throw error;
-  }
-}
-
-function testTokenRefresh() {
-  try {
-    clearTokenCache();
-    Logger.log("Cache cleared, getting new token...");
-    const token = getAccessToken();
-    Logger.log("New token obtained successfully");
-    return token;
-  } catch (error) {
-    Logger.log("Error in testTokenRefresh: " + error);
-    throw error;
-  }
-}
+} 
